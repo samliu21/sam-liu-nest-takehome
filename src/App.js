@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import TopStoryList from './TopStoryList';
+import fetch from 'node-fetch';
+import './App.css'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [stories, setStories] = useState([])
+
+	useEffect(() => {
+		const getData = async () => {
+			const response = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json')
+			const data = await response.json()
+
+			const fetchedStories = []
+			for (let i = 0; i < 10; ++i) {
+				const storyResponse = await fetch(`https://hacker-news.firebaseio.com/v0/item/${data[i]}.json`)
+				const storyData = await storyResponse.json()
+				fetchedStories.push(storyData)
+			}
+			setStories(fetchedStories)
+		}
+		getData()
+	}, [])
+	
+	return (
+		<div className="app-container">
+			<TopStoryList stories={stories} />
+		</div>
+	);
 }
 
 export default App;
